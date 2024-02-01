@@ -59,7 +59,7 @@ const Home = () => {
           setModalVisible(true);
           return;
         }
-
+  
         const userLocation = await Location.getCurrentPositionAsync({});
         setLocation({
           latitude: userLocation.coords.latitude,
@@ -70,11 +70,13 @@ const Home = () => {
         console.error("Error getting location:", error);
       } finally {
         setIsLoading(false);
+        fetchPosts(); // Fetch posts here
       }
     };
-
+  
     fetchLocation();
   }, []);
+  
 
   const reverseGeocode = async (latitude, longitude) => {
     try {

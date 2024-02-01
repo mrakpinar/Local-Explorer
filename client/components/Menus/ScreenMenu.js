@@ -60,7 +60,7 @@ const ScreenMenu = ({ initialRoute }) => {
           <Stack.Screen
             name="PostDetails"
             component={PostDetails}
-            options={{ headerShown: false }}
+            options={{ headerShown: true , title:"Post"}}
           />
         </>
       ) : (

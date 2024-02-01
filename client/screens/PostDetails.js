@@ -1,20 +1,44 @@
 import { View, Text, StyleSheet, ScrollView, Dimensions, SafeAreaView } from 'react-native'
-import React from 'react'
+import React,{useEffect, useState} from 'react'
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import {
     faUser,
 } from "@fortawesome/free-solid-svg-icons";
+import * as Location from "expo-location";
+
 
 let deviceWitdh = Dimensions.get('window').width
 let deviceHeight = Dimensions.get('window').height
 
+
+
 const PostDetails = ({ route }) => {
     const { post } = route.params
+    const [latitude,setLatitude] = useState("");
+    const [longitude,setLongitude] = useState("");
+
+    let city  = post?.location?.address.split(",")[0].trim();
+
+    useEffect(() => {
+        const geocode = async() =>{
+            const geocodedLocation = await Location.geocodeAsync(city);
+            if (geocodedLocation.length > 0) {
+                const { latitude, longitude } = geocodedLocation[0];
+                setLatitude(latitude);
+                setLongitude(longitude);
+                console.log("Latitude:", latitude);
+                console.log("Longitude:", longitude);
+              }
+        }
+        geocode()
+    }, [])
+
+  
     return (
         <SafeAreaView style={styles.container}>
             <Text style={styles.title}>{post?.title}</Text>
             <View>
-                <Text>Harita</Text>
+                <Text>{latitude}</Text>
             </View>
             <View style={styles.rightAlign}>
                 <FontAwesomeIcon
