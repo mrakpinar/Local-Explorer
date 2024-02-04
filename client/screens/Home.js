@@ -169,14 +169,17 @@ const Home = () => {
     setRefreshing(false);
   }, [cityInfo, modalVisible]);
 
+
   return (
     <SafeAreaView style={globalStyles.container}>
       <View style={{ flex: 1 }}>
-        {isLoading ? (
-          <View style={styles.loadingContainer}>
-            <ActivityIndicator size="large" color="#0000ff" />
-          </View>
-        ) : (
+        {
+        // isLoading ? (
+        //   <View style={styles.loadingContainer}>
+        //     <ActivityIndicator size="large" color="#0000ff" />
+        //   </View>
+        // ) :
+         (
           <View style={{ flex: 1 }}>
             <TouchableOpacity onPress={handleMapPress} style={{ flex: isMapFullscreen ? 0 : 0 }}>
               <View style={{ borderWidth: 1, marginBottom: 10, height: isMapFullscreen ? "100%" : 202 }}>

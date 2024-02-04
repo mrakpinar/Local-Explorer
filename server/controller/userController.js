@@ -84,9 +84,8 @@ const loginController = async (req, res) => {
 
     // token jwt
     const token = await JWT.sign({ _id: user._id }, process.env.JWT_SECRET, {
-      expiresIn: "7d",
+      expiresIn: "30d",
     });
-    console.log("Decoded Token:", JWT.decode(token));
 
     user.password = undefined;
     res.status(200).send({

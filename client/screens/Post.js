@@ -17,7 +17,8 @@ import {
   faSmile,
   faLocationDot,
   faCheck,
-  faDeleteLeft
+  faDeleteLeft,
+  
 } from "@fortawesome/free-solid-svg-icons";
 import PostButton from "../components/Forms/PostButton";
 import axios from "axios";
@@ -46,6 +47,7 @@ const Post = ({ navigation }) => {
     longitudeDelta: 0.001,
   });
   const [isMapFullscreen, setIsMapFullscreen] = useState(false);
+  const [city,setCity] = useState("");
 
   const data = [
     { key: '1', value: "Coffee" },
@@ -121,8 +123,10 @@ const Post = ({ navigation }) => {
         `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`
       );
 
-      // const { address } = response.data;
-      // console.log("City   :", address.city);
+      const { address } = response.data;
+      // console.log("City   :", address);
+      
+      setCity(address.province) // Bu sadece türkiye için province, çünkü bazı şehirlerde undefined
       // console.log("Country:", address.country);
     } catch (error) {
       console.error("Reverse geocoding error:", error);
@@ -142,26 +146,31 @@ const Post = ({ navigation }) => {
   };
 
   const handleConfirmLocation = () => {
-    // Confirm butonuna tıklandığında yapılacak işlemler
-    setIsMapFullscreen(false);
+    console.log("Confirm Location Pressed");
+    if (location) {
+      reverseGeocode(selectedLocation?.latitude, selectedLocation?.longitude);
+    }
 
+    setIsMapFullscreen(false);
+  
     if (selectedLocation) {
-      // Seçilen konumu ekrana bas
       console.log("Selected Location:", selectedLocation);
+      setLocation(selectedLocation);
     }
   };
+  
 
-  useEffect(() => {
-    if (location) {
-      reverseGeocode(location.latitude, location.longitude);
-    }
-  }, [location]);
+  // useEffect(() => {
+  //   if (location) {
+  //     reverseGeocode(selectedLocation?.latitude, selectedLocation?.longitude);
+  //   }
+  // }, [location]);
 
   useEffect(() => {
     if (location) {
       setInitialRegion({
-        latitude: location.latitude,
-        longitude: location.longitude,
+        latitude: selectedLocation?.latitude,
+        longitude: selectedLocation?.longitude,
         latitudeDelta: 0.0922,
         longitudeDelta: 0.0421,
       });
@@ -176,36 +185,39 @@ const Post = ({ navigation }) => {
             <ActivityIndicator size="large" color="#0000ff" />
           </View>
         ) : (
-          <View style={{ flex: 1 }}>
-            <TouchableOpacity onPress={handleMapPress} style={{ paddingTop: 55, marginLeft: 10, marginRight: 10 }}>
-              {isMapFullscreen ? (
-                <View style={{ height: "94%", marginBottom: 10 }}>
-                  <MapView
-                    provider={PROVIDER_GOOGLE}
-                    style={{ flex: 1 }}
-                    initialRegion={initialRegion}
-                    showsUserLocation={true}
-                    onPress={handleMapMarkerPress}
-                  >
-                    {selectedLocation && <Marker coordinate={selectedLocation} />}
-                  </MapView>
-                  <TouchableOpacity onPress={handleMapBack} style={styles.backButton}>
-                    <FontAwesomeIcon
-                      icon={faDeleteLeft}
-                      style={styles.iconStyle3}
-                      size={35}
-                    />
-                  </TouchableOpacity>
-                  <TouchableOpacity onPress={handleConfirmLocation} style={styles.confirmButton}>
-                    <FontAwesomeIcon
-                      icon={faCheck}
-                      style={styles.iconStyle4}
-                      size={55}
-                    />
-                  </TouchableOpacity>
-                </View>
-              ) : null}
-            </TouchableOpacity>
+          <View style={{ flex: 1,position:"relative", zIndex:-1 }}>
+          <TouchableOpacity onPress={handleMapPress} style={{ flex: isMapFullscreen ? 0 : 0 }}>
+          <View style={{ borderWidth: 1, marginBottom: 10, height: isMapFullscreen ? "100%" : 202 }}>
+          <MapView
+             provider={PROVIDER_GOOGLE}
+             style={{ flex: 1 }}
+             initialRegion={initialRegion}
+             showsUserLocation={true}
+             onPress={handleMapMarkerPress}
+
+          >
+            {selectedLocation && <Marker coordinate={selectedLocation} />}
+          </MapView>
+            {isMapFullscreen && (
+              <View style={{ position: "absolute" }}>
+                <TouchableOpacity onPress={handleMapBack} style={styles.backButton}>
+                  <FontAwesomeIcon
+                    icon={faDeleteLeft}
+                    style={styles.iconStyleBack}
+                    size={35}
+                  />
+                </TouchableOpacity>
+                <TouchableOpacity onPress={handleConfirmLocation} style={styles.checkButton}>
+                  <FontAwesomeIcon
+                    icon={faCheck}
+                    style={styles.iconStyleBack}
+                    size={35}
+                  />
+                </TouchableOpacity>
+              </View>
+            )}
+          </View>
+        </TouchableOpacity>
             <SelectList
               setSelected={(val) => setCategory(val)}
               data={data}
@@ -222,7 +234,6 @@ const Post = ({ navigation }) => {
               maxLength={32}
               onChangeText={(text) => setTitle(text)}
             />
-
             <View style={styles.descStyle}>
               <TextInput
                 style={styles.postDescriptionBox}
@@ -324,6 +335,8 @@ const styles = StyleSheet.create({
     bottom: 10,
     right: 10,
     marginRight: 105,
+    backgroundColor:"red",
+    zIndex:1000,
   },
   descStyle: {
     flexDirection: "column",
@@ -337,19 +350,34 @@ const styles = StyleSheet.create({
   },
   backButton: {
     position: "absolute",
-    top: 10,
-    left: 10,
-    zIndex: 1,
+    top: 20,
+    left: 20,
+    backgroundColor: "rgba(255, 255, 255, 0.3)",
+    padding: 15,
+    borderRadius: 5
   },
   confirmButton: {
-    position: "absolute",
+    position: "relative",
     bottom: 10,
     right: 10,
-    zIndex: 1,
+    zIndex: 1000,
+    backgroundColor:"blue"
   },
   postButton: {
     alignSelf: "center"
   },
+  iconStyleBack: {
+    color: "red",
+    
+  },
+  checkButton:{
+    position: "absolute",
+    top: 20,  // Deneme yanılma ile uygun bir değer seçin
+    left: 280,   // Deneme yanılma ile uygun bir değer seçin
+    backgroundColor: "rgba(255, 255, 255, 0.3)",
+    padding: 15,
+    borderRadius: 5
+  }
 });
 
 export default Post;

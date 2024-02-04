@@ -17,7 +17,7 @@ const PostProvider = ({ children }) => {
         "http://192.168.137.240:8080/api/v1/post/get-all-post"
       );
       setLoading(false);
-      console.log("Fetched Posts:", data.posts);
+      // console.log("Fetched Posts:", data.posts);
       // setPosts(data?.posts.location.address);
     } catch (error) {
       console.log("Error Fetching Posts:", error);
