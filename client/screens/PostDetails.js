@@ -1,21 +1,21 @@
-import { View, Text, StyleSheet, ScrollView, Dimensions, SafeAreaView } from 'react-native'
+import { View, Text, StyleSheet, ScrollView, Dimensions, SafeAreaView, ActivityIndicator } from 'react-native'
 import React,{useEffect, useState} from 'react'
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import {
     faUser,
 } from "@fortawesome/free-solid-svg-icons";
 import * as Location from "expo-location";
-
+import MapView, { Marker, PROVIDER_GOOGLE } from "react-native-maps";
 
 let deviceWitdh = Dimensions.get('window').width
 let deviceHeight = Dimensions.get('window').height
-
-
 
 const PostDetails = ({ route }) => {
     const { post } = route.params
     const [latitude,setLatitude] = useState("");
     const [longitude,setLongitude] = useState("");
+    const [location, setLocation] = useState();
+    const [isLoading,setIsLoading] = useState(true)
 
     let city  = post?.location?.address.split(",")[0].trim();
 
@@ -26,19 +26,48 @@ const PostDetails = ({ route }) => {
                 const { latitude, longitude } = geocodedLocation[0];
                 setLatitude(latitude);
                 setLongitude(longitude);
-                console.log("Latitude:", latitude);
-                console.log("Longitude:", longitude);
-              }
-        }
-        geocode()
-    }, [])
+                setLocation({
+                    latitude:latitude,
+                    longitude:longitude
+                });
+                setIsLoading(false); 
+                // console.log("Latitude:", latitude);
+                // console.log("Longitude:", longitude);
+                // console.log(location);
+            }
+        };
+        geocode();
+    }, []);
 
-  
+    useEffect(() => {
+        if (location === undefined) {
+            setIsLoading(true); 
+        }
+    }, [location]);
+    
     return (
         <SafeAreaView style={styles.container}>
             <Text style={styles.title}>{post?.title}</Text>
+            {isLoading ? (
+                <View style={styles.loadingContainer}>
+                    <ActivityIndicator size="large" color="#0000ff" />
+                </View>
+            ) : (
+                <MapView 
+                    provider={PROVIDER_GOOGLE}
+                    style={{ flex: 1, width: '100%', height: 400 }}
+                    initialRegion={{
+                        latitude: latitude,
+                        longitude: longitude,
+                        latitudeDelta: 0.00001,
+                        longitudeDelta: 0.00121,  
+                    }}>
+                    {location && <Marker coordinate={{latitude:latitude,longitude:longitude}} />}
+                </MapView>
+            )}
             <View>
                 <Text>{latitude}</Text>
+                <Text>{longitude}</Text>
             </View>
             <View style={styles.rightAlign}>
                 <FontAwesomeIcon
@@ -113,5 +142,10 @@ const styles = StyleSheet.create({
         fontSize: 12,
         paddingTop: 40,
         marginRight: 10
-    }
-})
+    },
+    loadingContainer: {
+        flex: 1,
+        justifyContent: "center",
+        alignItems: "center",
+    },
+});

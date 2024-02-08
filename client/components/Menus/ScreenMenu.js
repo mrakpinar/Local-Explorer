@@ -10,6 +10,7 @@ import Explorer from "../../screens/Explorer";
 import Profile from "../../screens/Profile";
 import Coffee from "../../screens/CategoriesScreens/Coffee";
 import PostDetails from "../../screens/PostDetails";
+import ProfileUpdateScreen from "../../screens/ProfileUpdateScreen";
 
 const ScreenMenu = ({ initialRoute }) => {
   const Stack = createNativeStackNavigator();
@@ -48,20 +49,26 @@ const ScreenMenu = ({ initialRoute }) => {
           <Stack.Screen
             name="Profile"
             component={Profile}
-            // options={{
-            //   headerBackTitle: "Back",
-            //   headerRight: () => <HeaderMenu />,
-            //   headerStyle: {
-            //     backgroundColor: "#F3EEEA",
-            //   },
-            // }}
-            options={{ headerShown: false }}
+            options={{
+              headerBackTitle: "Back",
+              headerRight: () => <HeaderMenu />,
+              headerStyle: {
+                backgroundColor: "#F3EEEA",
+              },
+            }}
+            // options={{ headerShown: false }}
           />
           <Stack.Screen
             name="PostDetails"
             component={PostDetails}
             options={{ headerShown: true , title:"Post"}}
-          />
+          /> 
+          <Stack.Screen
+          name="ProfileUpdateScreen"
+          component={ProfileUpdateScreen}
+          options={{ headerShown: true , title:"Profili Güncelle"}}
+        />
+
         </>
       ) : (
         <>

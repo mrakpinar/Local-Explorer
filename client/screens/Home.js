@@ -174,11 +174,11 @@ const Home = () => {
     <SafeAreaView style={globalStyles.container}>
       <View style={{ flex: 1 }}>
         {
-        // isLoading ? (
-        //   <View style={styles.loadingContainer}>
-        //     <ActivityIndicator size="large" color="#0000ff" />
-        //   </View>
-        // ) :
+        isLoading ? (
+          <View style={styles.loadingContainer}>
+            <ActivityIndicator size="large" color="#0000ff" />
+          </View>
+        ) :
          (
           <View style={{ flex: 1 }}>
             <TouchableOpacity onPress={handleMapPress} style={{ flex: isMapFullscreen ? 0 : 0 }}>
@@ -340,3 +340,50 @@ const styles = StyleSheet.create({
 });
 
 export default Home;
+
+
+// import React, { useState } from "react";
+// import { View, TextInput, Text, StyleSheet } from "react-native";
+// import axios from "axios";
+
+// const Home = () => {
+//   const [searchQuery, setSearchQuery] = useState("");
+//   const [predictions, setPredictions] = useState([]);
+
+//   const handleSearch = async () => {
+//     try {
+//       const response = await axios.get(
+//         `https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${searchQuery}&key=AIzaSyByaYdcZmvLWmx_Oxu_E0213AVhJSjD4Fo`
+//       );
+
+//       setPredictions(response.data.predictions);
+//     } catch (error) {
+//       console.error("Autocomplete error:", error);
+//     }
+//   };
+//   return (
+//     <View style={styles.container}>
+//     <TextInput
+//       style={styles.input}
+//       placeholder="Search for a place..."
+//       value={searchQuery}
+//       onChangeText={(text) => setSearchQuery(text)}
+//       onBlur={handleSearch}
+//     />
+//     <View style={styles.predictionsContainer}>
+//       {predictions.map((prediction) => (
+//         <Text key={prediction.id}>{prediction.description}</Text>
+//       ))}
+//     </View>
+//   </View>
+//   )
+// }
+
+// export default Home
+
+// const styles = StyleSheet.create({
+//   container:{
+//     flex:1,
+//     margin:50
+//   }
+// })

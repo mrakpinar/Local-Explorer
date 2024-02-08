@@ -9,8 +9,6 @@ import {
   SafeAreaView,
   ActivityIndicator
 } from "react-native";
-// ... (diğer import'lar)
-
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import {
   faImages,
@@ -18,7 +16,6 @@ import {
   faLocationDot,
   faCheck,
   faDeleteLeft,
-  
 } from "@fortawesome/free-solid-svg-icons";
 import PostButton from "../components/Forms/PostButton";
 import axios from "axios";
@@ -28,7 +25,7 @@ import { AuthContext } from "../context/authContext";
 import { PostContext } from "../context/postContext";
 import FooterMenu from "../components/Menus/FooterMenu";
 import globalStyles from "../assets/style";
-import { SelectList } from 'react-native-dropdown-select-list'
+import { SelectList } from 'react-native-dropdown-select-list';
 
 const Post = ({ navigation }) => {
   const [location, setLocation] = useState(null);
@@ -49,6 +46,7 @@ const Post = ({ navigation }) => {
   const [isMapFullscreen, setIsMapFullscreen] = useState(false);
   const [city,setCity] = useState("");
 
+
   const data = [
     { key: '1', value: "Coffee" },
     { key: '2', value: "Music" },
@@ -56,29 +54,29 @@ const Post = ({ navigation }) => {
     { key: '4', value: "Travel" },
   ];
 
-  useEffect(() => {
-    const fetchLocation = async () => {
-      try {
-        const { status } = await Location.requestForegroundPermissionsAsync();
-        if (status !== "granted") {
-          console.error("Location permission not granted");
-          return;
-        }
+  // useEffect(() => {
+  //   const fetchLocation = async () => {
+  //     try {
+  //       const { status } = await Location.requestForegroundPermissionsAsync();
+  //       if (status !== "granted") {
+  //         console.error("Location permission not granted");
+  //         return;
+  //       }
 
-        const userLocation = await Location.getCurrentPositionAsync({});
-        setLocation({
-          latitude: userLocation.coords.latitude,
-          longitude: userLocation.coords.longitude,
-        });
-      } catch (error) {
-        console.error("Error getting location:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
+  //       const userLocation = await Location.getCurrentPositionAsync({});
+  //       setLocation({
+  //         latitude: userLocation.coords.latitude,
+  //         longitude: userLocation.coords.longitude,
+  //       });
+  //     } catch (error) {
+  //       console.error("Error getting location:", error);
+  //     } finally {
+  //       setIsLoading(false);
+  //     }
+  //   };
 
-    fetchLocation();
-  }, []);
+  //   fetchLocation();
+  // }, []);
 
   const handlePost = async () => {
     try {
@@ -122,19 +120,19 @@ const Post = ({ navigation }) => {
       const response = await axios.get(
         `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`
       );
-
       const { address } = response.data;
-      // console.log("City   :", address);
-      
-      setCity(address.province) // Bu sadece türkiye için province, çünkü bazı şehirlerde undefined
-      // console.log("Country:", address.country);
+      const city = address.city || address.town || address.village || address.county;
+      const country = address.country;
+      const cityInfoText = `${city}, ${country}`;
+      setCity(cityInfoText);
+      console.log(city)
     } catch (error) {
       console.error("Reverse geocoding error:", error);
     }
   };
 
-  const handleMapPress = () => {
-    setIsMapFullscreen(true);
+  const handleMapPress = (e) => {
+    setSelectedLocation(e.nativeEvent.coordinate);
   };
 
   const handleMapBack = () => {
@@ -147,30 +145,27 @@ const Post = ({ navigation }) => {
 
   const handleConfirmLocation = () => {
     console.log("Confirm Location Pressed");
-    if (location) {
+    if (selectedLocation) {
       reverseGeocode(selectedLocation?.latitude, selectedLocation?.longitude);
     }
 
     setIsMapFullscreen(false);
-  
+
     if (selectedLocation) {
       console.log("Selected Location:", selectedLocation);
       setLocation(selectedLocation);
     }
   };
-  
 
-  // useEffect(() => {
-  //   if (location) {
-  //     reverseGeocode(selectedLocation?.latitude, selectedLocation?.longitude);
-  //   }
-  // }, [location]);
+  const handleMapFullscreen = () => {
+    setIsMapFullscreen(true);
+  };
 
   useEffect(() => {
     if (location) {
       setInitialRegion({
-        latitude: selectedLocation?.latitude,
-        longitude: selectedLocation?.longitude,
+        latitude: location?.latitude,
+        longitude: location?.longitude,
         latitudeDelta: 0.0922,
         longitudeDelta: 0.0421,
       });
@@ -180,44 +175,57 @@ const Post = ({ navigation }) => {
   return (
     <SafeAreaView style={globalStyles.container}>
       <ScrollView style={{ flex: 1 }}>
-        {isLoading ? (
-          <View style={styles.loadingContainer}>
-            <ActivityIndicator size="large" color="#0000ff" />
-          </View>
-        ) : (
-          <View style={{ flex: 1,position:"relative", zIndex:-1 }}>
-          <TouchableOpacity onPress={handleMapPress} style={{ flex: isMapFullscreen ? 0 : 0 }}>
-          <View style={{ borderWidth: 1, marginBottom: 10, height: isMapFullscreen ? "100%" : 202 }}>
-          <MapView
-             provider={PROVIDER_GOOGLE}
-             style={{ flex: 1 }}
-             initialRegion={initialRegion}
-             showsUserLocation={true}
-             onPress={handleMapMarkerPress}
+        
+          <View style={{ flex: 1, position: "relative", zIndex: -1 }}>
+            <TouchableOpacity
+              onPress={handleMapFullscreen}
+              style={{ flex: isMapFullscreen ? 0 : 0 }}
+            >
+              <View
+                style={{
+                  borderWidth: 1,
+                  marginBottom: 10,
+                  height: isMapFullscreen ? "100%" : 202,
+                }}
+              >
+                <MapView
+                  provider={PROVIDER_GOOGLE}
+                  style={{ flex: 1 }}
+                  initialRegion={initialRegion}
+                  showsUserLocation={true}
+                  onPress={isMapFullscreen ? handleMapPress : undefined}
+                >
+                  {selectedLocation && (
+                    <Marker coordinate={selectedLocation} />
+                  )}
+                </MapView>
 
-          >
-            {selectedLocation && <Marker coordinate={selectedLocation} />}
-          </MapView>
-            {isMapFullscreen && (
-              <View style={{ position: "absolute" }}>
-                <TouchableOpacity onPress={handleMapBack} style={styles.backButton}>
-                  <FontAwesomeIcon
-                    icon={faDeleteLeft}
-                    style={styles.iconStyleBack}
-                    size={35}
-                  />
-                </TouchableOpacity>
-                <TouchableOpacity onPress={handleConfirmLocation} style={styles.checkButton}>
-                  <FontAwesomeIcon
-                    icon={faCheck}
-                    style={styles.iconStyleBack}
-                    size={35}
-                  />
-                </TouchableOpacity>
+                {isMapFullscreen && (
+                  <View style={{ position: "absolute" }}>
+                    <TouchableOpacity
+                      onPress={handleMapBack}
+                      style={styles.backButton}
+                    >
+                      <FontAwesomeIcon
+                        icon={faDeleteLeft}
+                        style={styles.iconStyleBack}
+                        size={35}
+                      />
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      onPress={handleConfirmLocation}
+                      style={styles.checkButton}
+                    >
+                      <FontAwesomeIcon
+                        icon={faCheck}
+                        style={styles.iconStyleBack}
+                        size={35}
+                      />
+                    </TouchableOpacity>
+                  </View>
+                )}
               </View>
-            )}
-          </View>
-        </TouchableOpacity>
+            </TouchableOpacity>
             <SelectList
               setSelected={(val) => setCategory(val)}
               data={data}
@@ -272,7 +280,6 @@ const Post = ({ navigation }) => {
               <PostButton buttonText={"Post"} handleSubmit={handlePost} loading={loading} />
             </View>
           </View>
-        )}
       </ScrollView>
       <View style={styles.footerStyle}>
         <FooterMenu />
@@ -368,7 +375,6 @@ const styles = StyleSheet.create({
   },
   iconStyleBack: {
     color: "red",
-    
   },
   checkButton:{
     position: "absolute",
