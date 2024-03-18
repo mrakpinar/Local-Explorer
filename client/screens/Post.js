@@ -30,13 +30,11 @@ import { SelectList } from 'react-native-dropdown-select-list';
 const Post = ({ navigation }) => {
   const [location, setLocation] = useState(null);
   const [selectedLocation, setSelectedLocation] = useState(null);
-  const [state] = useContext(AuthContext);
   const [posts, setPosts] = useContext(PostContext);
   const [loading, setLoading] = useState(false);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [category, setCategory] = useState("");
-  const [isLoading, setIsLoading] = useState(true);
   const [initialRegion, setInitialRegion] = useState({
     latitude: 38.720,
     longitude: 35.55,
@@ -44,7 +42,7 @@ const Post = ({ navigation }) => {
     longitudeDelta: 0.001,
   });
   const [isMapFullscreen, setIsMapFullscreen] = useState(false);
-  const [city,setCity] = useState("");
+  const [city, setCity] = useState("");
 
 
   const data = [
@@ -52,31 +50,8 @@ const Post = ({ navigation }) => {
     { key: '2', value: "Music" },
     { key: '3', value: "Food" },
     { key: '4', value: "Travel" },
+    { key: '4', value: "Sport" },
   ];
-
-  // useEffect(() => {
-  //   const fetchLocation = async () => {
-  //     try {
-  //       const { status } = await Location.requestForegroundPermissionsAsync();
-  //       if (status !== "granted") {
-  //         console.error("Location permission not granted");
-  //         return;
-  //       }
-
-  //       const userLocation = await Location.getCurrentPositionAsync({});
-  //       setLocation({
-  //         latitude: userLocation.coords.latitude,
-  //         longitude: userLocation.coords.longitude,
-  //       });
-  //     } catch (error) {
-  //       console.error("Error getting location:", error);
-  //     } finally {
-  //       setIsLoading(false);
-  //     }
-  //   };
-
-  //   fetchLocation();
-  // }, []);
 
   const handlePost = async () => {
     try {
@@ -101,7 +76,7 @@ const Post = ({ navigation }) => {
       };
 
       const { data } = await axios.post(
-        "http://192.168.137.240:8080/api/v1/post/create-post",
+        "http://192.168.1.191:8080/api/v1/post/create-post",
         postData
       );
       setLoading(false);
@@ -125,7 +100,6 @@ const Post = ({ navigation }) => {
       const country = address.country;
       const cityInfoText = `${city}, ${country}`;
       setCity(cityInfoText);
-      console.log(city)
     } catch (error) {
       console.error("Reverse geocoding error:", error);
     }
@@ -175,111 +149,104 @@ const Post = ({ navigation }) => {
   return (
     <SafeAreaView style={globalStyles.container}>
       <ScrollView style={{ flex: 1 }}>
-        
-          <View style={{ flex: 1, position: "relative", zIndex: -1 }}>
-            <TouchableOpacity
-              onPress={handleMapFullscreen}
-              style={{ flex: isMapFullscreen ? 0 : 0 }}
-            >
-              <View
-                style={{
-                  borderWidth: 1,
-                  marginBottom: 10,
-                  height: isMapFullscreen ? "100%" : 202,
-                }}
-              >
-                <MapView
-                  provider={PROVIDER_GOOGLE}
-                  style={{ flex: 1 }}
-                  initialRegion={initialRegion}
-                  showsUserLocation={true}
-                  onPress={isMapFullscreen ? handleMapPress : undefined}
-                >
-                  {selectedLocation && (
-                    <Marker coordinate={selectedLocation} />
-                  )}
-                </MapView>
 
-                {isMapFullscreen && (
-                  <View style={{ position: "absolute" }}>
-                    <TouchableOpacity
-                      onPress={handleMapBack}
-                      style={styles.backButton}
-                    >
-                      <FontAwesomeIcon
-                        icon={faDeleteLeft}
-                        style={styles.iconStyleBack}
-                        size={35}
-                      />
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                      onPress={handleConfirmLocation}
-                      style={styles.checkButton}
-                    >
-                      <FontAwesomeIcon
-                        icon={faCheck}
-                        style={styles.iconStyleBack}
-                        size={35}
-                      />
-                    </TouchableOpacity>
-                  </View>
+        <View style={{ flex: 1, position: "relative", zIndex: -1, marginTop: 60, marginHorizontal: 5 }}>
+          <TouchableOpacity
+            onPress={handleMapFullscreen}
+            style={{ flex: isMapFullscreen ? 0 : 0 }}
+          >
+            <View
+              style={{
+                borderWidth: 1,
+                marginBottom: 10,
+                height: isMapFullscreen ? "100%" : 202,
+              }}
+            >
+              <MapView
+                provider={PROVIDER_GOOGLE}
+                style={{ flex: 1 }}
+                initialRegion={initialRegion}
+                showsUserLocation={true}
+                onPress={isMapFullscreen ? handleMapPress : undefined}
+              >
+                {selectedLocation && (
+                  <Marker coordinate={selectedLocation} />
                 )}
-              </View>
-            </TouchableOpacity>
-            <SelectList
-              setSelected={(val) => setCategory(val)}
-              data={data}
-              save="value"
-              defaultOption={{ key: "0", value: "Kategori" }}
-              boxStyles={{ width: 300, alignSelf: "center", backgroundColor: "#ffffff", marginBottom: 10, borderWidth: 1 }}
-            />
-            <Text>{category}</Text>
-            <TextInput
-              style={styles.postTitleBox}
-              placeholder="title (max. 32 character)"
-              placeholderTextColor={"#EBE3D5"}
-              value={title}
-              maxLength={32}
-              onChangeText={(text) => setTitle(text)}
-            />
-            <View style={styles.descStyle}>
-              <TextInput
-                style={styles.postDescriptionBox}
-                placeholder="Post Description"
-                placeholderTextColor={"#EBE3D5"}
-                value={description}
-                onChangeText={(text) => setDescription(text)}
-                multiline
-                textAlignVertical="top"
-              />
-              <View style={styles.iconContainer}>
-                <TouchableOpacity>
-                  <FontAwesomeIcon
-                    icon={faImages}
-                    style={styles.iconStyle2}
-                    size={26}
-                  />
-                </TouchableOpacity>
-                <TouchableOpacity>
-                  <FontAwesomeIcon
-                    icon={faSmile}
-                    style={styles.iconStyle3}
-                    size={26}
-                  />
-                </TouchableOpacity>
-                <TouchableOpacity onPress={handleMapPress}>
-                  <FontAwesomeIcon
-                    icon={faLocationDot}
-                    style={styles.iconStyle}
-                    size={26}
-                  />
-                </TouchableOpacity>
-              </View>
+              </MapView>
+
+              {isMapFullscreen && (
+                <View style={{ position: "absolute" }}>
+                  <TouchableOpacity
+                    onPress={handleMapBack}
+                    style={styles.backButton}
+                  >
+                    <FontAwesomeIcon
+                      icon={faDeleteLeft}
+                      style={styles.iconStyleBack}
+                      size={35}
+                    />
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    onPress={handleConfirmLocation}
+                    style={styles.checkButton}
+                  >
+                    <FontAwesomeIcon
+                      icon={faCheck}
+                      style={styles.iconStyleBack}
+                      size={35}
+                    />
+                  </TouchableOpacity>
+                </View>
+              )}
             </View>
-            <View style={styles.postButton}>
-              <PostButton buttonText={"Post"} handleSubmit={handlePost} loading={loading} />
+          </TouchableOpacity>
+          <SelectList
+            setSelected={(val) => setCategory(val)}
+            data={data}
+            save="value"
+            defaultOption={{ key: "0", value: "Kategori" }}
+            boxStyles={{ width: 300, alignSelf: "center", backgroundColor: "#ffffff", marginBottom: 10, borderWidth: 1 }}
+          />
+          {/* <Text>{category}</Text> */}
+          <TextInput
+            style={styles.postTitleBox}
+            placeholder="title (max. 32 character)"
+            placeholderTextColor={"#EBE3D5"}
+            value={title}
+            maxLength={32}
+            onChangeText={(text) => setTitle(text)}
+          />
+          <View style={styles.descStyle}>
+            <TextInput
+              style={styles.postDescriptionBox}
+              placeholder="Post Description"
+              placeholderTextColor={"#EBE3D5"}
+              value={description}
+              onChangeText={(text) => setDescription(text)}
+              multiline
+              textAlignVertical="top"
+            />
+            <View style={styles.iconContainer}>
+              <TouchableOpacity>
+                <FontAwesomeIcon
+                  icon={faImages}
+                  style={styles.iconStyle2}
+                  size={26}
+                />
+              </TouchableOpacity>
+              <TouchableOpacity>
+                <FontAwesomeIcon
+                  icon={faSmile}
+                  style={styles.iconStyle3}
+                  size={26}
+                />
+              </TouchableOpacity>
             </View>
           </View>
+          <View style={styles.postButton}>
+            <PostButton buttonText={"Post"} handleSubmit={handlePost} loading={loading} />
+          </View>
+        </View>
       </ScrollView>
       <View style={styles.footerStyle}>
         <FooterMenu />
@@ -320,30 +287,17 @@ const styles = StyleSheet.create({
     position: "relative",
     alignSelf: "center",
   },
-  iconStyle: {
-    position: "absolute",
-    bottom: 10,
-    right: 10,
-  },
   iconStyle2: {
     position: "absolute",
     bottom: 10,
-    right: 10,
+    right: -10,
     marginRight: 35,
   },
   iconStyle3: {
     position: "absolute",
     bottom: 10,
-    right: 10,
+    right: 0,
     marginRight: 70,
-  },
-  iconStyle4: {
-    position: "absolute",
-    bottom: 10,
-    right: 10,
-    marginRight: 105,
-    backgroundColor:"red",
-    zIndex:1000,
   },
   descStyle: {
     flexDirection: "column",
@@ -368,15 +322,15 @@ const styles = StyleSheet.create({
     bottom: 10,
     right: 10,
     zIndex: 1000,
-    backgroundColor:"blue"
+    backgroundColor: "blue"
   },
   postButton: {
-    alignSelf: "center"
+    alignSelf: "center",
   },
   iconStyleBack: {
     color: "red",
   },
-  checkButton:{
+  checkButton: {
     position: "absolute",
     top: 20,  // Deneme yanılma ile uygun bir değer seçin
     left: 280,   // Deneme yanılma ile uygun bir değer seçin

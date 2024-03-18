@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from "react";
-import { View, Text, StyleSheet, ScrollView, ActivityIndicator, TouchableOpacity, Pressable, RefreshControl } from "react-native";
+import { View, Text, StyleSheet, ScrollView, ActivityIndicator, TouchableOpacity, Pressable, RefreshControl, Image } from "react-native";
 import MapView, { Marker, PROVIDER_GOOGLE } from "react-native-maps";
 import * as Location from "expo-location";
 import axios from "axios";
@@ -18,7 +18,7 @@ const Home = () => {
   const [posts, setPosts] = useContext(PostContext);
   const [location, setLocation] = useState();
   const [cityInfo, setCityInfo] = useState("");
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   const [isMapFullscreen, setIsMapFullscreen] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
@@ -33,8 +33,8 @@ const Home = () => {
     setLoading(true);
     try {
       const apiUrl = category
-        ? `http://192.168.137.240:8080/api/v1/post/get-all-post?category=${category}`
-        : "http://192.168.137.240:8080/api/v1/post/get-all-post";
+        ? `http://192.168.1.191:8080/api/v1/post/get-all-post?category=${category}`
+        : "http://192.168.1.191:8080/api/v1/post/get-all-post";
 
       const { data } = await axios.get(apiUrl);
       setLoading(false);
@@ -51,6 +51,7 @@ const Home = () => {
   };
 
   useEffect(() => {
+
     const fetchLocation = async () => {
       try {
         const { status } = await Location.requestForegroundPermissionsAsync();
@@ -59,7 +60,7 @@ const Home = () => {
           setModalVisible(true);
           return;
         }
-  
+
         const userLocation = await Location.getCurrentPositionAsync({});
         setLocation({
           latitude: userLocation.coords.latitude,
@@ -70,13 +71,13 @@ const Home = () => {
         console.error("Error getting location:", error);
       } finally {
         setIsLoading(false);
-        fetchPosts(); // Fetch posts here
+        fetchPosts();
       }
     };
-  
+
     fetchLocation();
   }, []);
-  
+
 
   const reverseGeocode = async (latitude, longitude) => {
     try {
@@ -145,18 +146,6 @@ const Home = () => {
   };
 
 
-  // const onScroll = (event) => {
-  //   const offsetY = event.nativeEvent.contentOffset.y;
-  //   if (offsetY <= 0) {
-  //     setRefreshing(true);
-  //     fetchPosts(); // Yenileme fonksiyonunu çağırın
-
-  //     /*  Yenileme fonksiyonuna sonra tekrardan bir bak
-  //         LOG  Error Fetching Posts: [ReferenceError: Property 'setPosts' doesn't exist]
-  //      */
-  //   }
-  // };
-
   const homeNavigation = () => {
     fetchPosts();
     console.log("home")
@@ -174,70 +163,70 @@ const Home = () => {
     <SafeAreaView style={globalStyles.container}>
       <View style={{ flex: 1 }}>
         {
-        isLoading ? (
-          <View style={styles.loadingContainer}>
-            <ActivityIndicator size="large" color="#0000ff" />
-          </View>
-        ) :
-         (
-          <View style={{ flex: 1 }}>
-            <TouchableOpacity onPress={handleMapPress} style={{ flex: isMapFullscreen ? 0 : 0 }}>
-              <View style={{ borderWidth: 1, marginBottom: 10, height: isMapFullscreen ? "100%" : 202 }}>
-                <MapView
-                  provider={PROVIDER_GOOGLE}
-                  style={{ flex: 1 }}
-                  initialRegion={{
-                    latitude: location?.latitude || 38.5515,
-                    longitude: location?.longitude || 35.872,
-                    latitudeDelta: 0.0522,
-                    longitudeDelta: 0.0421,
-                  }}
-                  showsUserLocation={true}
-                >
-                  {location && <Marker coordinate={location} />}
-                </MapView>
-                {isMapFullscreen && (
-                  <TouchableOpacity onPress={handleMapBack} style={styles.backButton}>
-                    <FontAwesomeIcon
-                      icon={faDeleteLeft}
-                      style={styles.iconStyle3}
-                      size={35}
-                    />
-                  </TouchableOpacity>
-                )}
-              </View>
-            </TouchableOpacity>
-            <Text style={styles.cityAndCountry}>{cityInfo}</Text>
-            <View style={globalStyles.headerContainer}>
-              <TouchableOpacity onPress={homeNavigation}>
-                <Text style={globalStyles.header}>Home</Text>
-              </TouchableOpacity>
-              <Categories onCategoryPress={handleCategoryPress} />
+          isLoading ? (
+            <View style={styles.loadingContainer}>
+              <ActivityIndicator size="large" color="#0000ff" />
             </View>
-            {postCountInfo && (
-              <View style={styles.postCountContainer}>
-                <Text style={styles.postCountText}>{postCountInfo}</Text>
+          ) :
+            (
+              <View style={{ flex: 1 }}>
+                <TouchableOpacity onPress={handleMapPress} style={{ flex: isMapFullscreen ? 0 : 0, marginHorizontal: 10 }}>
+                  <View style={{ borderWidth: 1, marginBottom: 10, height: isMapFullscreen ? "100%" : 165, borderColor: "gray" }}>
+                    <MapView
+                      provider={PROVIDER_GOOGLE}
+                      style={{ flex: 1 }}
+                      initialRegion={{
+                        latitude: location?.latitude || 38.5515,
+                        longitude: location?.longitude || 35.872,
+                        latitudeDelta: 0.0522,
+                        longitudeDelta: 0.0421,
+                      }}
+                      showsUserLocation={true}
+                    >
+                      {location && <Marker coordinate={location} />}
+                    </MapView>
+                    {isMapFullscreen && (
+                      <TouchableOpacity onPress={handleMapBack} style={styles.backButton}>
+                        <FontAwesomeIcon
+                          icon={faDeleteLeft}
+                          style={styles.iconStyle3}
+                          size={35}
+                        />
+                      </TouchableOpacity>
+                    )}
+                  </View>
+                </TouchableOpacity>
+                <Text style={styles.cityAndCountry}>{cityInfo}</Text>
+                <View style={globalStyles.headerContainer}>
+                  <TouchableOpacity onPress={homeNavigation}>
+                    <Image source={require("../assets/images/localexplorer_rmbg.png")} style={{ width: 100, height: 100, borderRadius: 10, backgroundColor: "#FFB5DA" }} />
+                  </TouchableOpacity>
+                  <Categories onCategoryPress={handleCategoryPress} />
+                </View>
+                {postCountInfo && (
+                  <View style={styles.postCountContainer}>
+                    <Text style={styles.postCountText}>{postCountInfo}</Text>
+                  </View>
+                )}
+                <ScrollView
+                  // onScroll={onScroll}
+                  scrollEventThrottle={16}
+                  refreshControl={
+                    <RefreshControl
+                      refreshing={refreshing}
+                      onRefresh={fetchPosts}
+                    />
+                  }
+                >
+                  <ScrollView style={{ paddingLeft: 10 }}>
+                    <PostCard posts={posts} onPress={(post) => { navigation.navigate("PostDetails", { post }) }} />
+                  </ScrollView>
+                </ScrollView>
+                <View style={styles.footerStyle}>
+                  <FooterMenu />
+                </View>
               </View>
             )}
-            <ScrollView
-              // onScroll={onScroll}
-              scrollEventThrottle={16}
-              refreshControl={
-                <RefreshControl
-                  refreshing={refreshing}
-                  onRefresh={fetchPosts}
-                />
-              }
-            >
-              <ScrollView style={{ paddingLeft: 10 }}>
-                <PostCard posts={posts} onPress={(post) => { navigation.navigate("PostDetails", { post }) }} />
-              </ScrollView>
-            </ScrollView>
-            <View style={styles.footerStyle}>
-              <FooterMenu />
-            </View>
-          </View>
-        )}
       </View>
       <Modal
         isVisible={modalVisible}
@@ -289,9 +278,9 @@ const styles = StyleSheet.create({
     margin: 20,
     backgroundColor: "white",
     borderRadius: 20,
-    padding: 35,
+    padding: 45,
     alignItems: "center",
-    shadowColor: "#000",
+    shadowColor: "#111",
     shadowOffset: {
       width: 0,
       height: 2,
@@ -306,7 +295,8 @@ const styles = StyleSheet.create({
     elevation: 2,
   },
   buttonClose: {
-    backgroundColor: "#2196F3",
+    backgroundColor: "#FF8911",
+    width: 200
   },
   textStyle: {
     color: "white",
@@ -316,10 +306,10 @@ const styles = StyleSheet.create({
   modalText: {
     marginBottom: 15,
     textAlign: "center",
+    fontWeight: "700"
   },
   cityAndCountry: {
     textAlign: "center",
-    margin: 10,
     fontWeight: "900",
     fontSize: 16,
     color: "#776B5D",
@@ -340,50 +330,3 @@ const styles = StyleSheet.create({
 });
 
 export default Home;
-
-
-// import React, { useState } from "react";
-// import { View, TextInput, Text, StyleSheet } from "react-native";
-// import axios from "axios";
-
-// const Home = () => {
-//   const [searchQuery, setSearchQuery] = useState("");
-//   const [predictions, setPredictions] = useState([]);
-
-//   const handleSearch = async () => {
-//     try {
-//       const response = await axios.get(
-//         `https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${searchQuery}&key=AIzaSyByaYdcZmvLWmx_Oxu_E0213AVhJSjD4Fo`
-//       );
-
-//       setPredictions(response.data.predictions);
-//     } catch (error) {
-//       console.error("Autocomplete error:", error);
-//     }
-//   };
-//   return (
-//     <View style={styles.container}>
-//     <TextInput
-//       style={styles.input}
-//       placeholder="Search for a place..."
-//       value={searchQuery}
-//       onChangeText={(text) => setSearchQuery(text)}
-//       onBlur={handleSearch}
-//     />
-//     <View style={styles.predictionsContainer}>
-//       {predictions.map((prediction) => (
-//         <Text key={prediction.id}>{prediction.description}</Text>
-//       ))}
-//     </View>
-//   </View>
-//   )
-// }
-
-// export default Home
-
-// const styles = StyleSheet.create({
-//   container:{
-//     flex:1,
-//     margin:50
-//   }
-// })

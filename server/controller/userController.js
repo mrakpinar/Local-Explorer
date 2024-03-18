@@ -106,28 +106,18 @@ const loginController = async (req, res) => {
 
 const updateUserController = async (req, res) => {
   try {
-    const { name, password, email } = req.body;
+    const { name, password, email, profileImage } = req.body;
 
     // find user
     const user = await userModel.findOne({ email });
 
-    //password valid.
-    if (password && password.length < 6) {
-      res.status(400).send({
-        success: false,
-        message: "Password required and should be 6 character long!",
-      });
-    }
-
-    const hashedPassword = password ? await hashPassword(password) : undefined;
-
-    //update user
+    // update user's name and password
     const updatedUser = await userModel.findOneAndUpdate(
       { email },
-      { name: name || user.name, password: hashedPassword || user.password },
+      { name: name || user.name, password: password || user.password, profileImage: profileImage || user.profileImage },
       { new: true }
     );
-    user.password = undefined;
+
     res.status(200).send({
       success: true,
       message: "User Successfully Updated!",
@@ -137,11 +127,12 @@ const updateUserController = async (req, res) => {
     console.log(error);
     res.status(500).send({
       success: false,
-      message: "An error occured!",
+      message: "An error occurred while updating user!",
       error,
     });
   }
 };
+
 const updateSelectedCityController = async (req, res) => {
   try {
     const { selectedCity } = req.body;
@@ -166,6 +157,32 @@ const updateSelectedCityController = async (req, res) => {
     });
   }
 };
+const updateUserLocationController = async (req, res) => {
+  try {
+    const { email, latitude, longitude } = req.body;
+
+    // Kullanıcıyı bul
+    const user = await userModel.findOne({ email });
+
+    // Kullanıcının lokasyonunu güncelle
+    user.location = { latitude, longitude };
+    await user.save();
+
+    res.status(200).send({
+      success: true,
+      message: "User Location Successfully Updated!",
+      updatedUser: user,
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).send({
+      success: false,
+      message: "An error occurred while updating user location!",
+      error,
+    });
+  }
+};
+
 
 module.exports = {
   registerController,
@@ -173,4 +190,5 @@ module.exports = {
   updateUserController,
   requireSignIn,
   updateSelectedCityController,
+  updateUserLocationController,
 };

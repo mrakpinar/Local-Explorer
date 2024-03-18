@@ -1,5 +1,3 @@
-// RootNavigation.js
-
 import React from "react";
 import { AuthProvider } from "./context/authContext";
 import ScreenMenu from "./components/Menus/ScreenMenu";

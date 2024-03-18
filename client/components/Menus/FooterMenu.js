@@ -8,7 +8,7 @@ const FooterMenu = () => {
   const navigation = useNavigation();
   const route = useRoute();
   return (
-    <View style={{ backgroundColor: "#294B29", borderRadius: 60, margin: 7 }}>
+    <View style={{ backgroundColor: "#6420AA", borderRadius: 60, margin: 7 }}>
       <View style={globalStyles.footerContainer}>
         {/* <TouchableOpacity onPress={() => navigation.navigate("Explorer")}>
           <Icon
@@ -21,21 +21,21 @@ const FooterMenu = () => {
           <Icon
             style={globalStyles.footerIconStyle}
             name="plus-square"
-            color={route.name === "Post" ? "#ffffff" : "#DBE7C9"}
+            color={route.name === "Post" ? "#ffffff" : "#FF3EA5"}
           />
         </TouchableOpacity>
         <TouchableOpacity onPress={() => navigation.navigate("Home")}>
           <Icon
             style={globalStyles.footerIconStyle}
             name="home"
-            color={route.name === "Home" ? "#ffffff" : "#DBE7C9"}
+            color={route.name === "Home" ? "#ffffff" : "#FF3EA5"}
           />
         </TouchableOpacity>
         <TouchableOpacity onPress={() => navigation.navigate("Profile")}>
           <Icon
             style={globalStyles.footerIconStyle}
             name="user-circle"
-            color={route.name === "Profile" ? "#ffffff" : "#DBE7C9"}
+            color={route.name === "Profile" ? "#ffffff" : "#FF3EA5"}
           />
         </TouchableOpacity>
       </View>

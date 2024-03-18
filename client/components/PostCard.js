@@ -12,11 +12,11 @@ import globalStyles from "../assets/style";
 
 const PostCard = ({ posts, onPress }) => {
   return (
-    <View>
+    <View style={{ marginBottom: 50 }}>
       {posts?.map((post, i) => (
         <TouchableOpacity
           key={post?._id || i}
-          style={globalStyles.card}
+          style={[globalStyles.card, style.cardWithShadow]}
           onPress={() => onPress(post)}
         >
           <View style={globalStyles.headerStyle}>
@@ -44,7 +44,7 @@ const PostCard = ({ posts, onPress }) => {
           </View>
           <View
             style={{
-              borderBottomColor: "#ffffff",
+              borderBottomColor: "#000",
               borderBottomWidth: 1,
               marginVertical: 10,
             }}
@@ -55,7 +55,7 @@ const PostCard = ({ posts, onPress }) => {
               paddingTop: 5,
               fontWeight: "600",
               fontSize: 13,
-              color: "#776B5D",
+              color: "#000",
               padding: 20
             }}
             numberOfLines={3}
@@ -100,10 +100,11 @@ const style = StyleSheet.create({
   footer: {
     flexDirection: "row",
     justifyContent: "space-between",
-    paddingTop: 20,
+    paddingTop: 25,
   },
-
-
+  cardWithShadow: {
+    elevation: 3
+  }
 
 });
 

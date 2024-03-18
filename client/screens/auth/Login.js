@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, TextInput, Alert } from "react-native";
+import { View, Text, StyleSheet, TextInput, Alert, Image } from "react-native";
 import React, { useState, useContext } from "react";
 import { AuthContext } from "../../context/authContext";
 import InputBox from "../../components/Forms/InputBox";
@@ -28,21 +28,18 @@ const Login = ({ navigation }) => {
       }
 
       const response = await axios.post(
-        "http://192.168.137.240:8080/api/v1/auth/login",
+        "http://192.168.1.191:8080/api/v1/auth/login",
         { email, password }
       );
 
-      // Check if 'response.data' exists before accessing 'data'
       if (response && response.data) {
         setState(response.data);
 
-        // Save authentication data to AsyncStorage
         await AsyncStorage.setItem("@auth", JSON.stringify(response.data));
 
         navigation.navigate("Home");
         console.log("Data => ", response.data);
       } else {
-        // Handle the case where 'response.data' is not available
         alert("Unexpected response format");
       }
     } catch (error) {
@@ -53,17 +50,16 @@ const Login = ({ navigation }) => {
     }
   };
 
-  // temp func. to check local storage data
   const getLocalStorageData = async () => {
     let data = await AsyncStorage.getItem("@auth");
-    // console.log("Local Storage -> ", data);
   };
   getLocalStorageData();
 
   return (
     <View style={globalStyles.container}>
-      <Text style={globalStyles.title}>Login</Text>
-      <View style={{ marginHorizontal: 20 }}>
+      <Image source={require("../../assets/images/localexplorer.png")} style={{ width: "100%", height: 200 }} />
+      {/* <Image source={require("../../assets/images/login.png")} style={{ width: "100%", height: 200 }} /> */}
+      <View style={{ marginHorizontal: 35, marginTop: 100 }}>
         <InputBox
           inputPlaceHolder={"Email"}
           secureTextEntry={false}
@@ -100,7 +96,6 @@ const Login = ({ navigation }) => {
           Register
         </Text>{" "}
       </Text>
-      {/* <Text>{JSON.stringify({ name, email, password }, null, 4)}</Text> */}
     </View>
   );
 };

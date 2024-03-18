@@ -1,5 +1,5 @@
 import React, { useContext } from "react";
-import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import { createNativeStackNavigator, TransitionPresets } from "@react-navigation/native-stack";
 import Home from "../../screens/Home";
 import Register from "../../screens/auth/Register";
 import Login from "../../screens/auth/Login";
@@ -8,9 +8,9 @@ import { AuthContext } from "../../context/authContext";
 import HeaderMenu from "./HeaderMenu";
 import Explorer from "../../screens/Explorer";
 import Profile from "../../screens/Profile";
-import Coffee from "../../screens/CategoriesScreens/Coffee";
 import PostDetails from "../../screens/PostDetails";
 import ProfileUpdateScreen from "../../screens/ProfileUpdateScreen";
+import MyPosts from "../../screens/MyPosts";
 
 const ScreenMenu = ({ initialRoute }) => {
   const Stack = createNativeStackNavigator();
@@ -20,7 +20,9 @@ const ScreenMenu = ({ initialRoute }) => {
   const authenticatedUser = state?.user && state?.token;
 
   return (
-    <Stack.Navigator initialRouteName={initialRoute}>
+    <Stack.Navigator initialRouteName={initialRoute} screenOptions={{
+      animation: "slide_from_bottom",
+    }}>
       {authenticatedUser ? (
         <>
           <Stack.Screen
@@ -49,25 +51,30 @@ const ScreenMenu = ({ initialRoute }) => {
           <Stack.Screen
             name="Profile"
             component={Profile}
-            options={{
-              headerBackTitle: "Back",
-              headerRight: () => <HeaderMenu />,
-              headerStyle: {
-                backgroundColor: "#F3EEEA",
-              },
-            }}
-            // options={{ headerShown: false }}
+            // options={{
+            //   headerBackTitle: "Back",
+            //   headerRight: () => <HeaderMenu />,
+            //   headerStyle: {
+            //     backgroundColor: "#F3EEEA",
+            //   },
+            // }}
+            options={{ headerShown: false }}
           />
           <Stack.Screen
             name="PostDetails"
             component={PostDetails}
-            options={{ headerShown: true , title:"Post"}}
-          /> 
+            options={{ headerShown: true, title: "Post" }}
+          />
           <Stack.Screen
-          name="ProfileUpdateScreen"
-          component={ProfileUpdateScreen}
-          options={{ headerShown: true , title:"Profili Güncelle"}}
-        />
+            name="MyPosts"
+            component={MyPosts}
+            options={{ headerShown: true, title: "Paylaşımlarım" }}
+          />
+          <Stack.Screen
+            name="ProfileUpdateScreen"
+            component={ProfileUpdateScreen}
+            options={{ headerShown: true, title: "Profili Güncelle" }}
+          />
 
         </>
       ) : (

@@ -14,7 +14,7 @@ const PostProvider = ({ children }) => {
     setLoading(true);
     try {
       const { data } = await axios.get(
-        "http://192.168.137.240:8080/api/v1/post/get-all-post"
+        "http://192.168.1.191:8080/api/v1/post/get-all-post"
       );
       setLoading(false);
       // console.log("Fetched Posts:", data.posts);

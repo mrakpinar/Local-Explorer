@@ -15,7 +15,7 @@ const PostButton = ({ buttonText, handleSubmit, loading }) => {
 
 const style = StyleSheet.create({
   submitButtonStyle: {
-    backgroundColor: "#776B5D",
+    backgroundColor: "#FF3EA5",
     height: 50,
     width: 120,
     justifyContent: "center",

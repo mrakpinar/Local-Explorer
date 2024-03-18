@@ -81,29 +81,29 @@ const getAllPostsController = async (req, res) => {
 
     // Eğer kullanıcının konumu varsa, onun şehrine göre filtrele
     if (req.auth && req.auth.location) {
-      const { latitude, longitude } = req.auth.location;
-      const { city } = await reverseGeocode(latitude, longitude);
-
-      console.log("User Location:", req.auth.location);
-      console.log("User City:", city);
-
+      const userLocation = req.auth.location;
       filter = {
-        "location.address": new RegExp(city, "i"), // Büyük-küçük harf duyarlı olmayan şehir ismi filtresi
+        "location.coordinates": {
+          $nearSphere: {
+            $geometry: {
+              type: "Point",
+              coordinates: [userLocation.longitude, userLocation.latitude],
+            },
+            $maxDistance: 100000, // Adjust the distance as needed (meters)
+          },
+        },
       };
     }
 
     // Add category filter if available
     if (req.query.category) {
       filter.category = req.query.category;
-      console.log("Category Filter:", filter.category); // Log the category filter
     }
 
     const posts = await postModel
       .find(filter)
       .populate("postedBy", "_id name")
       .sort({ createdAt: -1 });
-
-    console.log("Filtered Posts Count:", posts.length);
 
     res.status(200).send({
       success: true,
@@ -121,6 +121,77 @@ const getAllPostsController = async (req, res) => {
 };
 
 
+const getUserPostsController = async (req, res) => {
+  try {
+    // İstekten gelen kullanıcı kimliğini al
+    const userId = req.params.userId
+    // Kullanıcının postlarını getir
+    const posts = await postModel
+      .find({ postedBy: userId })
+      .populate("postedBy", "_id") // İlgili alanları belirtin
+      .sort({ createdAt: -1 });
+
+    res.status(200).send({
+      success: true,
+      message: "All Posts",
+      posts,
+    });
+
+  } catch (error) {
+    console.error("Error fetching user's posts:", error);
+    res.status(500).json({
+      success: false,
+      message: "An error occurred while fetching user's posts",
+      error,
+    });
+  }
+};
 
 
-module.exports = { createPostController, getAllPostsController };
+
+const deletePostController = async (req, res) => {
+  try {
+    const postId = req.params.id;
+    const userId = req.userId; // Kullanıcının kimliğini al
+
+    // Silinecek gönderiyi bul
+    const post = await postModel.findById(postId);
+
+    // Gönderi bulunamazsa hata döndür
+    if (!post) {
+      return res.status(404).json({
+        success: false,
+        message: "Post not found",
+      });
+    }
+
+    // // Gönderinin sahibiyle, isteği gönderen kullanıcının kimliğini karşılaştır
+    // if (post.postedBy.toString() !== userId) {
+    //   return res.status(403).json({
+    //     success: false,
+    //     message: "Unauthorized: You are not allowed to delete this post",
+    //   });
+    // }
+
+    // Gönderiyi sil
+    const deletedPost = await postModel.findByIdAndDelete(postId);
+
+    // Başarılı bir yanıt döndür
+    res.status(200).json({
+      success: true,
+      message: "Post deleted successfully",
+      deletedPost,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      success: false,
+      message: "An error occurred while deleting the post",
+      error,
+    });
+  }
+};
+
+
+
+module.exports = { createPostController, getAllPostsController, deletePostController, getUserPostsController };

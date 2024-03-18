@@ -4,18 +4,18 @@ const userSchema = new mongoose.Schema(
   {
     name: {
       type: String,
-      required: [true, "please add name"],
+      required: [true, "Lütfen adınızı girin"],
       trim: true,
     },
     email: {
       type: String,
-      required: [true, "Please add email"],
+      required: [true, "Lütfen e-posta adresinizi girin"],
       unique: true,
       trim: true,
     },
     password: {
       type: String,
-      required: [true, "Please add password"],
+      required: [true, "Lütfen şifrenizi girin"],
       min: 6,
       max: 64,
     },
@@ -23,8 +23,26 @@ const userSchema = new mongoose.Schema(
       type: String,
       default: "user",
     },
+    profileImage: {
+      data: Buffer,
+      contentType: String
+    },
+    location: {
+      type: {
+        type: String,
+        enum: ["Point"],
+        required: false
+      },
+      coordinates: {
+        type: [Number],
+        required: false
+      }
+    }
   },
   { timestamps: true }
 );
+
+// Index for geospatial queries
+userSchema.index({ location: "2dsphere" });
 
 module.exports = mongoose.model("User", userSchema);

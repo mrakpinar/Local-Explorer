@@ -27,7 +27,7 @@ const Register = ({ navigation }) => {
       }
 
       const response = await axios.post(
-        "http://192.168.137.240:8080/api/v1/auth/register",
+        "http://192.168.1.191:8080/api/v1/auth/register",
         { name, email, password }
       );
 
@@ -71,7 +71,7 @@ const Register = ({ navigation }) => {
 
   return (
     <View style={globalStyles.container}>
-      <Text style={globalStyles.title}>Register</Text>
+      <Image source={require("../../assets/images/register.png")} style={{ width: "100%", height: 200 }} />
       <View style={{ marginHorizontal: 20 }}>
         <View style={{ alignItems: "center", }}>
           <TouchableOpacity onPress={pickImage}>

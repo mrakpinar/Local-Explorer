@@ -13,4 +13,6 @@ router.post("/login", loginController);
 
 router.put("/update-user", requireSignIn, updateUserController);
 
+// router.put("/update-location", requireSignIn, updateUserLocationController);
+
 module.exports = router;
